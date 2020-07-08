@@ -1,7 +1,6 @@
 import React from 'react';
 
 import {FlatList, StyleSheet, View} from 'react-native';
-import CategoryGridTile from "./CategoryGridTile";
 import MealItem from "./MealItem";
 
 const MealList = (props) => {
@@ -14,12 +13,9 @@ const MealList = (props) => {
                 affordability={itemData.item.affordability}
                 image={itemData.item.imageUrl}
                 onSelectMeal={() => {
-                    return props.navigation.navigate({
-                        routeName: 'MealDetail',
-                        params: {
-                            mealId: itemData.item.id,
-                            mealTitle: itemData.item.title
-                        }
+                    return props.navigation.navigate('MealDetail', {
+                        mealId: itemData.item.id,
+                        mealTitle: itemData.item.title
                     })
                 }}/>
         );

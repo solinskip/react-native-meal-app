@@ -18,7 +18,15 @@ const FiltersScreen = props => {
     }, [isGlutenFree, dispatch]);
 
     useEffect(() => {
-        props.navigation.setParams({savedFilters: savedFilters});
+        props.navigation.setOptions({
+            headerRight: () => <HeaderButtons HeaderButtonComponent={HeaderButton}>
+                <Item
+                    title='Favorite'
+                    iconName='save'
+                    onPress={savedFilters}
+                />
+            </HeaderButtons>
+        });
     }, [savedFilters]);
 
     return (
@@ -37,18 +45,11 @@ const FiltersScreen = props => {
     );
 };
 
-FiltersScreen.navigationOptions = navData => {
+export const screenOptions = navData => {
     return {
         headerLeft: () => <TouchableNativeFeedback onPress={() => {
             navData.navigation.toggleDrawer();
-        }}><Text style={{color: 'white'}}>Menu</Text></TouchableNativeFeedback>,
-        headerRight: () => <HeaderButtons HeaderButtonComponent={HeaderButton}>
-            <Item
-                title='Favorite'
-                iconName='save'
-                onPress={navData.navigation.getParam('savedFilters')}
-            />
-        </HeaderButtons>
+        }}><Text style={{color: 'white'}}>Menu</Text></TouchableNativeFeedback>
     };
 }
 

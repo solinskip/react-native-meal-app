@@ -1,95 +1,108 @@
-import {createAppContainer} from 'react-navigation';
-import {createStackNavigator} from 'react-navigation-stack';
-import {createBottomTabNavigator} from 'react-navigation-tabs';
-import {createDrawerNavigator} from "react-navigation-drawer";
-import CategoriesScreen from "../screens/CategoriesScreen";
-import CategoryMealScreen from "../screens/CategoryMealsScreen";
-import MealDetailScreen from "../screens/MealDetailScreen";
+import CategoriesScreen, {screenOptions as CategoryScreenOptions} from "../screens/CategoriesScreen";
+import CategoryMealsScreen, {screenOptions as CategoryMealsScreenOptions} from "../screens/CategoryMealsScreen";
+import MealDetailScreen, {screenOptions as MealDetailScreenOptions} from "../screens/MealDetailScreen";
 import Colors from "../constants/Colors";
 import FavoritesScreen from "../screens/FavoritesScreen";
 import Icons from 'react-native-vector-icons/dist/FontAwesome5';
 import React from "react";
-import {Platform, Text} from "react-native";
-import {createMaterialBottomTabNavigator} from "react-navigation-material-bottom-tabs";
-import FiltersScreen from "../screens/FiltersScreen";
+import {Platform} from "react-native";
+import {createMaterialBottomTabNavigator} from '@react-navigation/material-bottom-tabs';
+
+import FiltersScreen, {screenOptions as FiltersScreenOptions} from "../screens/FiltersScreen";
+import {createStackNavigator} from '@react-navigation/stack';
+import {createDrawerNavigator} from '@react-navigation/drawer';
 
 const defaultSettingsNavigator = {
     // initialRouteName: 'Categories', // Default is first element in object 'Categories'
-    defaultNavigationOptions: {
-        headerStyle: {
-            backgroundColor: Colors.primary
-        },
-        headerTintColor: 'white'
-    }
+    headerStyle: {
+        backgroundColor: Colors.primary
+    },
+    headerTintColor: 'white'
 }
 
-const MealsNavigator = createStackNavigator({
-    Categories: {
-        screen: CategoriesScreen,
-        navigationOptions: {
-            headerTitle: 'Meal Categories'
-        }
-    },
-    CategoryMeals: CategoryMealScreen,
-    MealDetail: MealDetailScreen
-}, defaultSettingsNavigator);
-
-const FavoritesNavigator = createStackNavigator({
-    Favorites: FavoritesScreen,
-    MealDetail: MealDetailScreen
-}, defaultSettingsNavigator);
-
-const tabScreenConfig = {
-    Meals: {
-        screen: MealsNavigator,
-        navigationOptions: {
-            tabBarIcon: (tabInfo) => <Icons name='utensils' size={25} color={tabInfo.tintColor}/>,
-            tabBarColor: Colors.primary
-        },
-    },
-    Favorites: {
-        screen: FavoritesNavigator,
-        navigationOptions: {
-            tabBarLabel: 'Favorites', // Default is key of tab
-            tabBarIcon: tabInfo => <Icons name='star' size={25} color={tabInfo.tintColor}/>,
-            tabBarColor: Colors.accent
-        },
-
-    }
+const MealsStackNavigator = createStackNavigator();
+export const MealsNavigator = () => {
+    return (<MealsStackNavigator.Navigator screenOptions={defaultSettingsNavigator}>
+        <MealsStackNavigator.Screen
+            name='Categories'
+            component={CategoriesScreen}
+            options={CategoryScreenOptions}
+        />
+        <MealsStackNavigator.Screen
+            name='CategoryMeals'
+            component={CategoryMealsScreen}
+            options={CategoryMealsScreenOptions}
+        />
+        <MealsStackNavigator.Screen
+            name='MealDetail'
+            component={MealDetailScreen}
+            options={MealDetailScreenOptions}
+        />
+    </MealsStackNavigator.Navigator>);
 };
 
-const MealsFavTabNavigator = Platform.select({
-    android: createMaterialBottomTabNavigator(tabScreenConfig, {
-        activeTintColor: Colors.accent,
-        shifting: true, // Default false
-        // Use barStyle if you want to chang background color of tabs and shifting option in set to false
-        // barStyle: {
-        //     backgroundColor: Colors.primary
-        // }
-    }),
-    ios: createBottomTabNavigator(tabScreenConfig, {
-        tabBarOptions: {
-            activeTintColor: Colors.accent,
-        }
-    })
+const FavoritesStackNavigator = createStackNavigator();
+export const FavoritesNavigator = () => {
+    return <FavoritesStackNavigator.Navigator screenOptions={defaultSettingsNavigator}>
+        <FavoritesStackNavigator.Screen
+            name='Favorites'
+            component={FavoritesScreen}
+        />
+        <FavoritesStackNavigator.Screen
+            name='MealDetail'
+            component={MealDetailScreen}
+            options={MealDetailScreenOptions}
+        />
+    </FavoritesStackNavigator.Navigator>
+};
+
+const MealsFavTabNavigator = createMaterialBottomTabNavigator();
+export const MealsFavNavigator = () => Platform.select({
+    android: <MealsFavTabNavigator.Navigator
+        activeTintColor={Colors.accent}
+        shifting={true}
+    >
+        <MealsFavTabNavigator.Screen
+            name='Meals'
+            component={MealsNavigator}
+            options={{
+                tabBarIcon: (tabInfo) => <Icons name='utensils' size={25} color={tabInfo.tintColor}/>,
+                tabBarColor: Colors.primary
+            }}
+        />
+        <MealsFavTabNavigator.Screen
+            name='Favorites'
+            component={FavoritesNavigator}
+            options={{
+                tabBarLabel: 'Favorites', // Default is key of tab
+                tabBarIcon: tabInfo => <Icons name='star' size={25} color={tabInfo.tintColor}/>,
+                tabBarColor: Colors.accent
+            }}
+        />
+    </MealsFavTabNavigator.Navigator>
 });
 
-const FiltersNavigator = createStackNavigator({
-    Filters: FiltersScreen
-}, defaultSettingsNavigator);
+const FiltersStackNavigator = createStackNavigator();
+export const FiltersNavigator = () => {
+    return <FiltersStackNavigator.Navigator screenOptions={defaultSettingsNavigator}>
+        <FiltersStackNavigator.Screen
+            name='Filters'
+            component={FiltersScreen}
+            options={FiltersScreenOptions}
+        />
+    </FiltersStackNavigator.Navigator>
+};
 
-const MainNavigator = createDrawerNavigator({
-    MealsFav: {
-        screen: MealsFavTabNavigator,
-        navigationOptions: {
-            drawerLabel: 'Meals'
-        }
-    },
-    Filters: FiltersNavigator
-}, {
-    contentOptions: {
-        activeTintColor: Colors.accent
-    }
-});
-
-export default createAppContainer(MainNavigator);
+const MainDrawerNavigator = createDrawerNavigator();
+export const MainNavigator = () => {
+    return <MainDrawerNavigator.Navigator>
+        <MainDrawerNavigator.Screen
+            name='MealsFav'
+            component={MealsFavNavigator}
+            options={{
+                title: 'Meals'
+            }}
+        />
+        <MainDrawerNavigator.Screen name='Filters' component={FiltersNavigator}/>
+    </MainDrawerNavigator.Navigator>
+};

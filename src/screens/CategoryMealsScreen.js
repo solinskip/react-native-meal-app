@@ -4,7 +4,7 @@ import MealList from "../components/MealList";
 import {useSelector} from "react-redux";
 
 const CategoryMealScreen = props => {
-    const categoryId = props.navigation.getParam('categoryId');
+    const categoryId = props.route.params.categoryId;
     const availableMeals = useSelector(state => state.meals.filteredMeals);
     const displayedMeals = availableMeals.filter(meal => meal.categoryIds.indexOf(categoryId) >= 0);
 
@@ -12,8 +12,8 @@ const CategoryMealScreen = props => {
 
 };
 // Dynamic set header title
-CategoryMealScreen.navigationOptions = (navigationData) => {
-    const categoryId = navigationData.navigation.getParam('categoryId');
+export const screenOptions = navigationData => {
+    const categoryId = navigationData.route.params.categoryId;
     const selectedCategory = CATEGORIES.find(category => category.id === categoryId);
 
     return {
