@@ -1,0 +1,69 @@
+import React, {useCallback, useEffect} from 'react';
+import {Image, ScrollView, StyleSheet, Text, View} from 'react-native';
+import {MEALS} from "../data/dumyData";
+import {HeaderButtons, Item} from "react-navigation-header-buttons";
+import HeaderButton from "../components/HeaderButton";
+import {useDispatch, useSelector} from "react-redux";
+import {toggleFavorites} from "../store/actions/meals";
+
+const MealDetailScreen = props => {
+    const availableMeals = useSelector(state => state.meals.meals);
+    const mealId = props.navigation.getParam('mealId');
+    const meal = availableMeals.find(meal => meal.id === mealId);
+
+    const dispatch = useDispatch();
+
+    const toggleFavoritesHandler = useCallback(() => {
+        dispatch(toggleFavorites(mealId));
+    }, [dispatch, mealId]);
+
+    useEffect(() => {
+        props.navigation.setParams({toggleFav: toggleFavoritesHandler});
+    }, [toggleFavoritesHandler]);
+
+    return (
+        <ScrollView>
+            <Image source={{uri: meal.imageUrl}} style={styles.image}/>
+            <View style={{...StyleSheet.flatten(styles.mealRow), ...StyleSheet.flatten(styles.mealDetail)}}>
+                <Text>{meal.duration}m</Text>
+                <Text>{meal.complexity.toUpperCase()}</Text>
+                <Text>{meal.affordability.toUpperCase()}</Text>
+            </View>
+            <Text style={styles.title}>Ingredients</Text>
+        </ScrollView>
+    );
+};
+
+MealDetailScreen.navigationOptions = navigationData => {
+    const toggleFavorite = navigationData.navigation.getParam('toggleFav');
+
+    return {
+        headerTitle: navigationData.navigation.getParam('mealTitle'),
+        headerRight: () => <HeaderButtons HeaderButtonComponent={HeaderButton}>
+            <Item
+                title='Favorite'
+                iconName='star'
+                onPress={toggleFavorite}
+            />
+        </HeaderButtons>
+    }
+};
+
+const styles = StyleSheet.create({
+    image: {
+        width: '100%',
+        height: 200
+    },
+    mealRow: {
+        flexDirection: 'row'
+    },
+    mealDetail: {
+        paddingHorizontal: 10,
+        justifyContent: 'space-between',
+        alignItems: 'center',
+        height: '15%'
+    }
+});
+
+
+export default MealDetailScreen;
